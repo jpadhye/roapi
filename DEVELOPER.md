@@ -1,18 +1,18 @@
 
 ## Project Overview
 
-Generated using: https://gitdiagram.com/roapi/roapi
+Generated using: [gitdiagram.com](https://gitdiagram.com/roapi/roapi)
 
 ### 1. Project Type and Purpose
-ROAPI is a full-stack Rust application comprising:
-- **Core Query Engine Crate (`columnq`)**: Loads datasets and translates queries into Apache Arrow/Datafusion plans.
-- **Server Crate (`roapi`)**: Wraps `columnq` and exposes multi-protocol APIs (REST, GraphQL, SQL, FlightSQL, Postgres wire, key-value).
-- **Web UI Front-End Crate (`roapi-ui`)**: Built to query APIs in-browser.
-- **Command-Line Client Crate (`columnq-cli`)**: Enables local data exploration using the same engine.
+ROAPI is a full-stack Rust application with the following components:
+- **Core Query Engine (`columnq`)**: Loads datasets and translates queries into Apache Arrow/Datafusion plans.
+- **Server (`roapi`)**: Wraps `columnq` and provides multi-protocol APIs (REST, GraphQL, SQL, FlightSQL, Postgres wire, key-value).
+- **Web UI (`roapi-ui`)**: Browser-based API query interface.
+- **CLI Client (`columnq-cli`)**: Local data exploration using the same engine.
 
 ---
 
-### 2. File Structure Analysis
+### 2. File Structure
 #### Top-Level Crates:
 - **`columnq-cli/`**: CLI binary.
 - **`columnq/`**: Core library (query frontends, data layer, response encoding).
@@ -21,81 +21,75 @@ ROAPI is a full-stack Rust application comprising:
 
 #### Shared Config & Orchestration:
 - **`.devcontainer/`, `Dockerfile`, `docker-compose.yml`**: Local dev and container setup.
-- **`ci/`**: Scripts to provision cloud object stores (Azure, GCS, MinIO).
-- **GitHub Workflows**: Build, release, security audit.
+- **`ci/`**: Cloud object store provisioning scripts.
+- **GitHub Workflows**: Build, release, and security audit.
 
 #### Test and Sample Data:
-- **`test_data/`**: Test data.
+- **`test_data/`**: Sample datasets.
 - **`test_end_to_end/`**: End-to-end tests.
+
+---
 
 ### 3. Key Architectural Insights
 - Query frontends for SQL, GraphQL, REST, FlightSQL, Postgres wire.
-- Data layer modules for various formats (CSV, JSON, Parquet, Excel, Delta, spreadsheets) and storage backends (FS, HTTP, S3, GCS, Azure, MySQL, SQLite, Postgres).
-- Execution engine based on Datafusion (Arrow record batches).
-- Response encoding layer to serialize into JSON, Arrow streams, Parquet, etc.
+- Data layer supports multiple formats (CSV, JSON, Parquet, Excel, Delta) and storage backends (FS, HTTP, S3, GCS, Azure, MySQL, SQLite, Postgres).
+- Execution engine based on Apache Datafusion.
+- Response encoding into JSON, Arrow streams, Parquet, etc.
 - Dynamic table registration via HTTP API.
 - Built-in Web UI served at `/ui`.
 
 ---
 
-### 4. Main Components 
+### 4. Main Components
 #### a. Clients & Interfaces
-- CLI client (`columnq-cli`).
+- CLI (`columnq-cli`).
 - Web UI (`roapi-ui` served by `roapi`).
-- External clients: HTTP/REST, GraphQL, SQL over HTTP, FlightSQL, Postgres wire, key-value HTTP.
+- External clients: REST, GraphQL, SQL, FlightSQL, Postgres wire, key-value HTTP.
 
 #### b. `roapi` Server
 - HTTP server layer (`tower-http`).
 - Protocol routers: REST, GraphQL, SQL, FlightSQL, Postgres wire.
-- Context & middleware layers (authentication placeholder, logging).
-- Table registration API (`/api/table`).
+- Middleware for authentication, logging, and table registration API (`/api/table`).
 
 #### c. `columnq` Engine
-- Query frontend modules (`sql.rs`, `graphql.rs`, `rest.rs`, `flight_sql.rs`).
-- Data layer modules (`fs.rs`, `http.rs`, `object_store.rs`, `memory.rs`).
-- Encoding layer modules (`arrow.rs`, `csv.rs`, `json.rs`, `parquet.rs`).
-- Table abstractions (arrow_ipc, csv, excel, delta, google_sheets, database connectors).
-- Error handling, utilities, test utilities.
+- Query frontends (`sql.rs`, `graphql.rs`, `rest.rs`, `flight_sql.rs`).
+- Data connectors (`fs.rs`, `http.rs`, `object_store.rs`, `memory.rs`).
+- Encoding modules (`arrow.rs`, `csv.rs`, `json.rs`, `parquet.rs`).
+- Table abstractions for various formats and connectors.
 
 #### d. Execution Runtime
-- Apache Arrow in-memory data representation.
-- Apache Datafusion query planner & executor.
+- Apache Arrow for in-memory data representation.
+- Apache Datafusion for query planning and execution.
 
 #### e. Storage & Data Sources
-- Local filesystem, HTTP endpoints, S3/GCS/Azure stores, RDBMS (MySQL, SQLite, Postgres), Google Sheets.
-- Sample/test data under `test_data/`.
+- Local filesystem, HTTP endpoints, S3/GCS/Azure, RDBMS (MySQL, SQLite, Postgres), Google Sheets.
+- Test data under `test_data/`.
 
 #### f. CI/CD & DevContainer
-- GitHub Actions workflows (build, release, security audit).
-- Dockerfile, `docker-compose`, `devcontainer.json` for local development.
+- GitHub Actions workflows for build, release, and security audit.
+- Docker and DevContainer setup for local development.
 
 ---
 
 ### 5. Relationships and Data Flows
-- **External Client** → `roapi` HTTP server → Protocol router → `columnq` query frontend → Datafusion plan → Data layer connectors → Arrow record batches → Encoding layer → `roapi` HTTP response → Client.
+- **External Client** → `roapi` HTTP server → Protocol router → `columnq` query frontend → Datafusion plan → Data connectors → Arrow record batches → Encoding layer → HTTP response → Client.
 - **Web UI**: Served statically by `roapi`, communicates via REST/GraphQL/SQL endpoints.
-- **CLI Client**: Links directly against `columnq` library, bypassing HTTP server.
-- **Table Registration API**: Writes to in-memory table catalog in `columnq` engine.
+- **CLI Client**: Directly links against `columnq` library, bypassing the HTTP server.
+- **Table Registration API**: Updates in-memory table catalog in `columnq`.
 
 ---
 
-### 6. Architectural Patterns & Design Principles
+### 6. Architectural Patterns
 - **Layered Architecture**:
-    1. Protocol layer.
-    2. Business logic/query engine layer (`columnq`).
-    3. Data source abstraction layer.
-    4. Storage/connectors layer.
-- Modular Rust crates to isolate concerns.
-- Use of Arrow/Datafusion for in-memory columnar analytics.
-- Pluggable frontends and encoders via trait abstractions.
+   1. Protocol layer.
+   2. Query engine (`columnq`).
+   3. Data source abstraction.
+   4. Storage/connectors.
+- Modular Rust crates for separation of concerns.
+- Apache Arrow/Datafusion for in-memory analytics.
+- Pluggable frontends and encoders via traits.
 
-
-#### Color Code:
-- **Blue**: User-facing components (UI, CLI, HTTP endpoints).
-- **Green**: Core engine/crates (`columnq`, Datafusion).
-- **Orange**: External systems/connectors (S3, GCS, database).
-- **Grey**: Infrastructure (CI/CD, Docker, DevContainer).
-
+---
 
 ### 7. Component Mapping
 
@@ -105,85 +99,31 @@ ROAPI is a full-stack Rust application comprising:
 
 #### 2. Web UI (`roapi-ui`)
 - **Directory**: `roapi-ui/`
-- **Source Files**: 
-    - `roapi-ui/src/{main.rs, app.rs, lib.rs}`
-- **Assets**: 
-    - `roapi-ui/assets/`
-    - `roapi-ui/index.html`
-    - `roapi-ui/Trunk.toml`
+- **Source Files**: `roapi-ui/src/{main.rs, app.rs, lib.rs}`
+- **Assets**: `roapi-ui/assets/`, `roapi-ui/index.html`, `roapi-ui/Trunk.toml`
 
 #### 3. `roapi` Server
-- **a. HTTP Server Layer**: `roapi/src/server/http/`
-    - `layers.rs`
-    - `ui.rs`
-    - `mod.rs`
-- **b. Protocol Routers / API Handlers**: `roapi/src/api/`
-    - `rest.rs`
-    - `graphql.rs`
-    - `sql.rs`
-    - `kv.rs`
-    - `register.rs`
-    - `routes.rs`
-    - `schema.rs`
-- **c. Context & Middleware**:
-    - `roapi/src/context.rs`
-    - `roapi/src/server/http/layers.rs`
-- **d. Startup & Configuration**:
-    - `roapi/src/startup.rs`
-    - `roapi/src/config.rs`
-- **e. FlightSQL & Postgres Wire**:
-    - `roapi/src/server/flight_sql.rs`
-    - `roapi/src/server/postgres.rs`
+- **HTTP Server**: `roapi/src/server/http/`
+- **Protocol Handlers**: `roapi/src/api/`
+- **Middleware**: `roapi/src/context.rs`
+- **Startup**: `roapi/src/startup.rs`
+- **FlightSQL & Postgres Wire**: `roapi/src/server/`
 
 #### 4. `columnq` Core Engine
-- **a. Query Frontends**: `columnq/src/query/`
-    - `sql.rs`
-    - `rest.rs`
-    - `graphql.rs`
-    - `mod.rs`
-- **b. Data Layer / IO Connectors**: `columnq/src/io/`
-    - `fs.rs`
-    - `http.rs`
-    - `object_store.rs`
-    - `memory.rs`
-    - `mod.rs`
-- **c. Encoding Layer**: `columnq/src/encoding/`
-    - `arrow.rs`
-    - `csv.rs`
-    - `json.rs`
-    - `parquet.rs`
-    - `mod.rs`
-- **d. Table Abstractions**: `columnq/src/table/`
-    - `arrow_ipc_file.rs`
-    - `arrow_ipc_stream.rs`
-    - `csv.rs`
-    - `excel.rs`
-    - `delta.rs`
-    - `google_spreadsheets.rs`
-    - `json.rs`
-    - `ndjson.rs`
-    - `parquet.rs`
-    - `database.rs`
-    - `mod.rs`
-- **e. Engine Entry Point & Utilities**:
-    - `columnq/src/lib.rs`
-    - `columnq/src/columnq.rs`
-    - `columnq/src/error.rs`
-    - `columnq/src/test_util.rs`
+- **Query Frontends**: `columnq/src/query/`
+- **Data Connectors**: `columnq/src/io/`
+- **Encoding Modules**: `columnq/src/encoding/`
+- **Table Abstractions**: `columnq/src/table/`
+- **Utilities**: `columnq/src/{lib.rs, columnq.rs, error.rs}`
 
-5. Execution Runtime  
-   - (Apache Arrow & Datafusion invoked via columnq/src/lib.rs; no dedicated files)
+#### 5. CI/CD & DevContainer
+- **GitHub Actions**: `.github/workflows/`
+- **Docker & DevContainer**: `Dockerfile`, `docker-compose.yml`, `.devcontainer/`
+- **Cloud Setup Scripts**: `ci/scripts/`
 
-6. Storage & Sample Data  
-   - test_data/  
-   - test_end_to_end/
+---
 
-7. CI/CD & DevContainer  
-   - GitHub Actions: .github/workflows/{build.yml, columnq_cli_release.yml, roapi_release.yml, scheduled_security_audit.yml}  
-   - Docker & DevContainer: Dockerfile, docker-compose.yml, .devcontainer/{devcontainer.json, db-migration.sql}  
-   - Cloud setup scripts: ci/scripts/{setup_*.sh, populate_*.sh}
-
-
+### 8. Data Flow Diagram
 ```mermaid
 graph TB
     subgraph "Clients & Interfaces"
