@@ -38,7 +38,7 @@ ROAPI is a full-stack Rust application comprising:
 
 ---
 
-### 4. Main Components for the System-Design Diagram
+### 4. Main Components 
 #### a. Clients & Interfaces
 - CLI client (`columnq-cli`).
 - Web UI (`roapi-ui` served by `roapi`).
@@ -97,73 +97,79 @@ ROAPI is a full-stack Rust application comprising:
 - **Grey**: Infrastructure (CI/CD, Docker, DevContainer).
 
 
-### 7. Component Mapping:
+### 7. Component Mapping
 
-1. CLI Client ("columnq-cli"): columnq-cli/  
-   - columnq-cli/src/main.rs
+#### 1. CLI Client (`columnq-cli`)
+- **Directory**: `columnq-cli/`
+- **Main File**: `columnq-cli/src/main.rs`
 
-2. Web UI ("roapi-ui"): roapi-ui/  
-   - roapi-ui/src/{main.rs, app.rs, lib.rs}  
-   - roapi-ui/assets/, roapi-ui/index.html, roapi-ui/Trunk.toml
+#### 2. Web UI (`roapi-ui`)
+- **Directory**: `roapi-ui/`
+- **Source Files**: 
+    - `roapi-ui/src/{main.rs, app.rs, lib.rs}`
+- **Assets**: 
+    - `roapi-ui/assets/`
+    - `roapi-ui/index.html`
+    - `roapi-ui/Trunk.toml`
 
-3. roapi Server  
-   a. HTTP Server Layer: roapi/src/server/http/  
-      - layers.rs  
-      - ui.rs  
-      - mod.rs  
-   b. Protocol Routers / API Handlers: roapi/src/api/  
-      - rest.rs  
-      - graphql.rs  
-      - sql.rs  
-      - kv.rs  
-      - register.rs  
-      - routes.rs  
-      - schema.rs  
-   c. Context & Middleware:  
-      - roapi/src/context.rs  
-      - roapi/src/server/http/layers.rs  
-   d. Startup & Configuration:  
-      - roapi/src/startup.rs  
-      - roapi/src/config.rs  
-   e. FlightSQL & Postgres Wire:  
-      - roapi/src/server/flight_sql.rs  
-      - roapi/src/server/postgres.rs
+#### 3. `roapi` Server
+- **a. HTTP Server Layer**: `roapi/src/server/http/`
+    - `layers.rs`
+    - `ui.rs`
+    - `mod.rs`
+- **b. Protocol Routers / API Handlers**: `roapi/src/api/`
+    - `rest.rs`
+    - `graphql.rs`
+    - `sql.rs`
+    - `kv.rs`
+    - `register.rs`
+    - `routes.rs`
+    - `schema.rs`
+- **c. Context & Middleware**:
+    - `roapi/src/context.rs`
+    - `roapi/src/server/http/layers.rs`
+- **d. Startup & Configuration**:
+    - `roapi/src/startup.rs`
+    - `roapi/src/config.rs`
+- **e. FlightSQL & Postgres Wire**:
+    - `roapi/src/server/flight_sql.rs`
+    - `roapi/src/server/postgres.rs`
 
-4. columnq Core Engine  
-   a. Query Frontends: columnq/src/query/  
-      - sql.rs  
-      - rest.rs  
-      - graphql.rs  
-      - mod.rs  
-   b. Data Layer / IO Connectors: columnq/src/io/  
-      - fs.rs  
-      - http.rs  
-      - object_store.rs  
-      - memory.rs  
-      - mod.rs  
-   c. Encoding Layer: columnq/src/encoding/  
-      - arrow.rs  
-      - csv.rs  
-      - json.rs  
-      - parquet.rs  
-      - mod.rs  
-   d. Table Abstractions: columnq/src/table/  
-      - arrow_ipc_file.rs  
-      - arrow_ipc_stream.rs  
-      - csv.rs  
-      - excel.rs  
-      - delta.rs  
-      - google_spreadsheets.rs  
-      - json.rs  
-      - ndjson.rs  
-      - parquet.rs  
-      - database.rs  
-      - mod.rs  
-   e. Engine Entry Point & Utilities:  
-      - columnq/src/lib.rs  
-      - columnq/src/columnq.rs  
-      - columnq/src/error.rs  
-      - columnq/src/test_util.rs
+#### 4. `columnq` Core Engine
+- **a. Query Frontends**: `columnq/src/query/`
+    - `sql.rs`
+    - `rest.rs`
+    - `graphql.rs`
+    - `mod.rs`
+- **b. Data Layer / IO Connectors**: `columnq/src/io/`
+    - `fs.rs`
+    - `http.rs`
+    - `object_store.rs`
+    - `memory.rs`
+    - `mod.rs`
+- **c. Encoding Layer**: `columnq/src/encoding/`
+    - `arrow.rs`
+    - `csv.rs`
+    - `json.rs`
+    - `parquet.rs`
+    - `mod.rs`
+- **d. Table Abstractions**: `columnq/src/table/`
+    - `arrow_ipc_file.rs`
+    - `arrow_ipc_stream.rs`
+    - `csv.rs`
+    - `excel.rs`
+    - `delta.rs`
+    - `google_spreadsheets.rs`
+    - `json.rs`
+    - `ndjson.rs`
+    - `parquet.rs`
+    - `database.rs`
+    - `mod.rs`
+- **e. Engine Entry Point & Utilities**:
+    - `columnq/src/lib.rs`
+    - `columnq/src/columnq.rs`
+    - `columnq/src/error.rs`
+    - `columnq/src/test_util.rs`
 
 5. Execution Runtime  
    - (Apache Arrow & Datafusion invoked via columnq/src/lib.rs; no dedicated files)
